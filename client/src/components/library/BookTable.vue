@@ -283,20 +283,27 @@ function editBook(book: Book) {
       const genre = (document.getElementById("genre") as HTMLSelectElement)
         .value;
 
-      if (!title || !author) {
-        Swal.showValidationMessage("Title and Author are required.");
+      // ตรวจสอบว่ากรอกครบทุกช่อง
+      if (!title || !author || !yearStr || !genre) {
+        Swal.showValidationMessage("กรุณากรอกทุกช่องให้ครบ");
         return false;
       }
-      const published_year = yearStr ? parseInt(yearStr, 10) : null;
 
+      // เช็คว่า year เป็นตัวเลขบวก
+      const published_year = parseInt(yearStr, 10);
+      if (isNaN(published_year) || published_year <= 0) {
+        Swal.showValidationMessage("ปีที่พิมพ์ต้องเป็นตัวเลขบวกเท่านั้น");
+        return false;
+      }
+
+      // เริ่มอัพเดต
       try {
         await axios.put(`http://localhost:5000/api/books/${book.id}`, {
           title,
           author,
           published_year,
-          genre: genre || null,
+          genre,
         });
-        // อัปเดตข้อมูลในตารางทันที
         await fetchBooks();
         Swal.fire("Updated!", "Book has been updated.", "success");
       } catch {
@@ -337,27 +344,40 @@ function createInputRow(
   type = "text"
 ) {
   return `
-    <div style="display:flex; align-items:center;">
-      <label for="${id}" style="width:140px; font-weight:600; text-align:right; margin-right:12px; white-space:nowrap;">
+    <div style='display:flex; align-items:center;'>
+      <label for='${id}' style='width:140px; font-weight:600; text-align:right; margin-right:12px; white-space:nowrap;'>
         ${label}:
       </label>
-      <input id="${id}" type="${type}" value="${value}" class="swal2-input" style="flex:1;" />
+      <input
+        id='${id}'
+        type='${type}'
+        value='${value}'
+        required
+        class='swal2-input'
+        style='flex:1;'
+      />
     </div>
   `;
 }
+
 function createSelectRow(label: string, id: string, selected: string | null) {
   const opts = ["History", "Fiction", "Science", "Thriller"]
     .map(
       (o) =>
-        `<option value="${o}" ${o === selected ? "selected" : ""}>${o}</option>`
+        `<option value='${o}' ${o === selected ? "selected" : ""}>${o}</option>`
     )
     .join("");
   return `
-    <div style="display:flex; align-items:center;">
-      <label for="${id}" style="width:140px; font-weight:600; text-align:right; margin-right:12px; white-space:nowrap;">
+    <div style='display:flex; align-items:center;'>
+      <label for='${id}' style='width:140px; font-weight:600; text-align:right; margin-right:12px; white-space:nowrap;'>
         ${label}:
       </label>
-      <select id="${id}" class="swal2-input" style="flex:1;">
+      <select
+        id='${id}'
+        class='swal2-input'
+        required
+        style='flex:1;'
+      >
         ${opts}
       </select>
     </div>

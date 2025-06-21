@@ -9,9 +9,8 @@
       >
         <div class="text-center lg:text-left">
           <h2 class="text-2xl font-bold mb-2">Welcome, Jakrawut Sainate</h2>
-          <p class="text-sm opacity-90 mb-4 max-w-md">
-            Lorem Ipsum is simply dummy text of the printing and typesetting
-            industry.
+          <p class="text-sm opacity-90 mb-4 max-w-lg">
+            Develop a Book Management System with full CRUD functionality within 5 days
           </p>
         </div>
 
@@ -40,7 +39,9 @@
             class="flex items-center gap-2 text-sm text-gray-700"
           >
             <span
-              :style="{ backgroundColor: chartColors[index % chartColors.length] }"
+              :style="{
+                backgroundColor: chartColors[index % chartColors.length],
+              }"
               class="w-4 h-4 rounded"
             ></span>
             {{ genre }} ({{ count }})
@@ -58,52 +59,56 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, nextTick } from "vue"
-import Chart, { ChartConfiguration } from "chart.js/auto"
+import { ref, watch, nextTick } from "vue";
+import Chart, { ChartConfiguration } from "chart.js/auto";
 
 const props = defineProps<{
-  books: any[]
-  genreCountMap: Record<string, number>
-}>()
+  books: any[];
+  genreCountMap: Record<string, number>;
+}>();
 
 const chartColors = ref([
-  "#f87171", "#fbbf24", "#34d399", "#60a5fa", "#a78bfa"
-])
+  "#f87171",
+  "#fbbf24",
+  "#34d399",
+  "#60a5fa",
+  "#a78bfa",
+]);
 
-const canvasRef = ref<HTMLCanvasElement | null>(null)
-let chartInstance: Chart | null = null
+const canvasRef = ref<HTMLCanvasElement | null>(null);
+let chartInstance: Chart | null = null;
 
 async function renderChart() {
-  await nextTick()
-  if (!canvasRef.value) return
+  await nextTick();
+  if (!canvasRef.value) return;
 
-  const entries = Object.entries(props.genreCountMap) as [string, number][]
-  const labels = entries.map(([genre]) => genre)
-  const data = entries.map(([, count]) => count)
+  const entries = Object.entries(props.genreCountMap) as [string, number][];
+  const labels = entries.map(([genre]) => genre);
+  const data = entries.map(([, count]) => count);
 
   const config: ChartConfiguration<"doughnut"> = {
     type: "doughnut",
     data: {
       labels,
-      datasets: [{ data, backgroundColor: chartColors.value }]
+      datasets: [{ data, backgroundColor: chartColors.value }],
     },
     options: {
       responsive: true,
       maintainAspectRatio: false,
       cutout: "50%",
-      plugins: { legend: { display: false } }
-    }
-  }
+      plugins: { legend: { display: false } },
+    },
+  };
 
   if (chartInstance) {
-    chartInstance.data.labels = labels
-    chartInstance.data.datasets[0].data = data
-    chartInstance.update()
+    chartInstance.data.labels = labels;
+    chartInstance.data.datasets[0].data = data;
+    chartInstance.update();
   } else {
-    const ctx = canvasRef.value.getContext("2d")!
-    chartInstance = new Chart(ctx, config)
+    const ctx = canvasRef.value.getContext("2d")!;
+    chartInstance = new Chart(ctx, config);
   }
 }
 
-watch(() => props.genreCountMap, renderChart, { deep: true, immediate: true })
+watch(() => props.genreCountMap, renderChart, { deep: true, immediate: true });
 </script>

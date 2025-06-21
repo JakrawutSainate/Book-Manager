@@ -7,7 +7,7 @@
   </div>
 </template>
 
-<!-- import Component ที่ไว้ใช้ทุกหน้าของ App -->
+<!-- Component ที่ไว้ใช้ทุกหน้า -->
 <script setup lang="ts">
 import Sidebar from '@/components/Sidebar.vue'
 </script>
